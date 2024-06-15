@@ -10,7 +10,9 @@ prompts to generate the prompt template
 
 ## Make sure to install Poppler before running the app
 https://poppler.freedesktop.org/
+
 https://github.com/oschwartz10612/poppler-windows/releases
+
 https://stackoverflow.com/questions/18381713/how-to-install-poppler-on-windows
 
 ## To run the app
