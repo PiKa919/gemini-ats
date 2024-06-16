@@ -1,6 +1,6 @@
 import base64
 from dotenv import load_dotenv
-
+# Load environment variables from a .env file
 load_dotenv()
 
 import streamlit as st
@@ -10,14 +10,38 @@ import pdf2image
 import google.generativeai as genai
 import io
 
+# Configure the Google Generative AI API with the API key from environment variables
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 def get_gemini_response(input, pdf_content, prompt):
+    """
+    Calls the Gemini Generative AI model to generate a response based on the input prompt and PDF content.
+    
+    Parameters:
+    - input (str): The input text prompt for the model.
+    - pdf_content (list): A list of dictionaries, each containing the base64 encoded data of the PDF pages.
+    - prompt (str): Additional prompt information for the model.
+    
+    Returns:
+    - str: The text response from the model.
+    """
     model = genai.GenerativeModel('gemini-pro-vision')
     response = model.generate_content(input, pdf_content, prompt)
     return response.text
 
 def input_pdf_setup(uploaded_file):
+    """
+    Converts the first page of a PDF file to a JPEG image and encodes it in base64.
+    
+    Parameters:
+    - uploaded_file: The uploaded file object.
+    
+    Returns:
+    - list: A list containing a dictionary with the mime type and base64 encoded data of the first page.
+    
+    Raises:
+    - FileNotFoundError: If no file is uploaded.
+    """
     if uploaded_file is not None:
         #convert the pdf to image
         images = pdf2image.convert_from_bytes(uploaded_file.read())
@@ -40,19 +64,20 @@ def input_pdf_setup(uploaded_file):
         raise FileNotFoundError("File not found")
     
 
-## Streamlit App
+# Streamlit App Configuration
 st.set_page_config(page_title="Gemini ATS", page_icon=":robot:", layout="wide")
 st.header("Gemini ATS tracking system")
 input_text = st.text_area("Job Description", "Please enter the job description here", key="input")
 uploaded_file = st.file_uploader("Upload resume in PDF file", type=["pdf"])
 
+# Streamlit UI Elements
 if uploaded_file is not None:
     st.write("File uploaded successfully")
     
 submit1 = st.button("Tell me about the RESUME")
-
 submit2 = st.button("HR Round analysis")
 
+# Input prompts for the Gemini model
 input_prompt1 = """You are an experienced ATS (Applicant Tracking System) specialist tasked with analyzing resumes for keyword matching and overall suitability for a specific job opening. 
 
 
@@ -85,7 +110,7 @@ Additional Notes:
     Consider industry best practices and current trends in the technical skillset required for the role.
     Look for keywords that showcase the candidate's technical proficiency.."""
     
-
+# Handling button clicks and displaying responses
 if submit1:
     if uploaded_file is not None:
         pdf_content = input_pdf_setup(uploaded_file)
